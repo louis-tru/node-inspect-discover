@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Node inspect auto discover</title>
+
+	<link rel="stylesheet" href="text_defaults.css" />
+	<link rel="stylesheet" href="popup.css" />
+	<script src="jquery-3.4.0.min.js" type="text/javascript"></script>
+	<script src="utils.js" type="text/javascript"></script>
+	<script src="popup.js" type="text/javascript"></script>
+</head>
+<body>
+
+	<dialog id="config-dialog" class="target-discovery config" open="">
+
+		<!--div id="config-dialog-close" class="close-button"></div-->
+		<div id="port-forwarding-config-title" class="title port-forwarding">Port forwarding settings</div>
+		<div id="target-discovery-config-title" class="title target-discovery">Target discovery settings</div>
+
+		<div id="config-list" class="list">
+		</div>
+
+		<div id="port-forwarding-message" class="message port-forwarding">
+				Define the listening port on your device that maps to a port accessible
+				from your development machine.
+			<a href="https://developer.chrome.com/devtools/docs/remote-debugging#reverse-port-forwarding" target="_blank">Learn more</a>
+		</div>
+
+		<div id="targets-message" class="message target-discovery">
+				Specify hosts and ports of the target discovery servers.
+		</div>
+
+		<div class="config-buttons">
+			<label class="port-forwarding">
+				<input id="port-forwarding-enable" type="checkbox">Enable port forwarding
+			</label>
+			<button id="button-done">Done</button>
+		</div>
+
+	</dialog>
+
+</body>
+
+</html>
