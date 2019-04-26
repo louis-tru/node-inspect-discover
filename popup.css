@@ -448,3 +448,13 @@ dialog.target-discovery .port-forwarding {
 .available input {
 	background: #00ff00;
 }
+
+.button-div {
+	display: flex;
+	width: 100%;
+	justify-content: space-between;
+}
+
+#button-switch.on {
+	background: #0f0;
+}

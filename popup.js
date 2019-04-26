@@ -119,6 +119,16 @@ function render(data, fresh) {
 	return div;
 }
 
+function updateSwitch() {
+	if (localStorage.getItem('switch') === '1') {
+		$('#button-switch').html('Off');
+		$('#button-switch').addClass('on');
+	} else {
+		$('#button-switch').html('On');
+		$('#button-switch').removeClass('on');
+	}
+}
+
 $(function() {
 
 	config_list_div = $('#config-list');//querySelector
@@ -127,6 +137,17 @@ $(function() {
 		list.forEach(e=>e.commit());
 		close();
 	});
+
+	$('#button-switch').click(function() {
+		if (localStorage.getItem('switch') === '1') {
+			localStorage.setItem('switch', '0');
+		} else {
+			localStorage.setItem('switch', '1');
+		}
+		updateSwitch();
+	});
+
+	updateSwitch();
 
 	/*
 		<div class="target-discovery-line config-list-row">

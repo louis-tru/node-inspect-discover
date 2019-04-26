@@ -1,6 +1,7 @@
 
 // check
 setInterval(function() {
+	if (localStorage.getItem('switch') !== '1') return;
 	get().map(e=>check(e.value, function(err, desc) {
 		if (err) return;
 		var url = 
