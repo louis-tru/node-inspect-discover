@@ -39,7 +39,7 @@ setInterval(function() {
 			url = fix_devtools_url(url, e, desc);
 
 			chrome.tabs.query({ url }, function(result) {
-				if (result.length == 0) {
+				if (!result || result.length == 0) {
 					if (tabs[host] && tabs[host].active) {
 						chrome.tabs.update(tabs[host].id, { url });
 					} else {
