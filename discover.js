@@ -11,6 +11,7 @@ function fix_devtools_url(url, item, desc) {
 		return `${a}${item.value}/`;
 	});
 	if (url[0] == '/') {
+		// url = 'chrome-devtools:/' + url;
 		url = 'chrome-devtools:/' + url;
 		url = url.replace('devtools/inspector.html', 'devtools/bundled/inspector.html');
 	}
@@ -39,15 +40,17 @@ setInterval(function() {
 			url = fix_devtools_url(url, e, desc);
 
 			chrome.tabs.query({ url }, function(result) {
-				if (!result || result.length == 0) {
+				if (result && result.length) return;
+				chrome.tabs.query({ url: url.replace('chrome-', '') }, function(result) {
+					if (result && result.length) return;
 					if (tabs[host] && tabs[host].active) {
-						chrome.tabs.update(tabs[host].id, { url });
+						chrome.tabs.update(tabs[host].id, { url: url });
 					} else {
-						chrome.tabs.create({ url }, function(tab) {
+						chrome.tabs.create({ url: url }, function(tab) {
 							tabs[host] = tab;
 						});
 					}
-				}
+				});
 			});
 		}
 	}));
