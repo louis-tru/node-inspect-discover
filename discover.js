@@ -34,24 +34,22 @@ setInterval(function() {
 	if (localStorage.getItem('switch') !== '1') return;
 	get().map(e=>check(e.value, function(err, desc) {
 		if (err) return;
+		var url = desc.devtoolsFrontendUrlCompat || desc.devtoolsFrontendUrl;
+		if (!url) return;
+		url = fix_devtools_url(url, e, desc);
 		var host = e.value;
-		var url = desc.devtoolsFrontendUrl;
-		if (url) {
-			url = fix_devtools_url(url, e, desc);
-
+		chrome.tabs.query({ url: url.replace('chrome-', '') }, function(result) {
+			if (result && result.length) return;
 			chrome.tabs.query({ url }, function(result) {
 				if (result && result.length) return;
-				chrome.tabs.query({ url: url.replace('chrome-', '') }, function(result) {
-					if (result && result.length) return;
-					if (tabs[host] && tabs[host].active) {
-						chrome.tabs.update(tabs[host].id, { url: url });
-					} else {
-						chrome.tabs.create({ url: url }, function(tab) {
-							tabs[host] = tab;
-						});
-					}
-				});
+				if (tabs[host] && tabs[host].active) {
+					chrome.tabs.update(tabs[host].id, { url: url });
+				} else {
+					chrome.tabs.create({ url: url }, function(tab) {
+						tabs[host] = tab;
+					});
+				}
 			});
-		}
+		});
 	}));
 }, 500);
