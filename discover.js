@@ -15,6 +15,12 @@ function fix_devtools_url(url, item, desc) {
 		url = 'chrome-devtools:/' + url;
 		url = url.replace('devtools/inspector.html', 'devtools/bundled/inspector.html');
 	}
+
+	var m = navigator.userAgent.match(/Chrome\/(\d+)/);
+	if (m && Number(m[1]) >= 83) {
+		url = url.replace('chrome-devtools', 'devtools');
+	}
+
 	return url;
 }
 
