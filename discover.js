@@ -18,7 +18,7 @@ function fix_devtools_url(url, item, desc) {
 
 	var m = navigator.userAgent.match(/Chrome\/(\d+)/);
 	if (m && Number(m[1]) >= 83) {
-		url = url.replace('chrome-devtools', 'devtools');
+		url = url.replace('chrome-devtools:', 'devtools:');
 	}
 
 	return url;
