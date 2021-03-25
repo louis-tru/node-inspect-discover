@@ -10,9 +10,10 @@ function fix_devtools_url(url, item, desc) {
 	url = url.replace(/(wss?=).+?\//, function(all, a, b) {
 		return `${a}${item.value}/`;
 	});
+	url = url.replace(/^chrome-devtools:/, 'chrome:');
+	url = url.replace(/^devtools:/, 'chrome:');
 	if (url[0] == '/') {
-		// url = 'chrome-devtools:/' + url;
-		url = 'chrome-devtools:/' + url;
+		url = 'chrome:/' + url;
 		url = url.replace('devtools/inspector.html', 'devtools/bundled/inspector.html');
 	}
 
@@ -25,37 +26,62 @@ function fix_devtools_url(url, item, desc) {
 }
 
 var tabs = {};
+var checking = false;
 
 chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
 	for (var host in tabs) {
 		var tab = tabs[host];
-		if (tab.id == tabId) {
+		if (!tab || tab.id == tabId) {
 			delete tabs[host];
 		}
 	}
 });
 
-// check
-setInterval(function() {
-	if (localStorage.getItem('switch') !== '1') return;
-	get().map(e=>check(e.value, function(err, desc) {
-		if (err) return;
+function check_tab(url) {
+	return new Promise((resolve)=>{
+		chrome.tabs.query({ url }, function(result) {
+			resolve(result && result.length ? true: false);
+		});
+	});
+}
+
+async function check() {
+
+	for (var e of get()) {
+		var desc = await request_desc(e.value);
+		if (!desc) continue;
 		var url = desc.devtoolsFrontendUrlCompat || desc.devtoolsFrontendUrl;
-		if (!url) return;
+		if (!url) continue;
+
 		url = fix_devtools_url(url, e, desc);
 		var host = e.value;
-		chrome.tabs.query({ url: url.replace('chrome-', '') }, function(result) {
-			if (result && result.length) return;
-			chrome.tabs.query({ url }, function(result) {
-				if (result && result.length) return;
-				if (tabs[host] && tabs[host].active) {
-					chrome.tabs.update(tabs[host].id, { url: url });
-				} else {
-					chrome.tabs.create({ url: url }, function(tab) {
-						tabs[host] = tab;
-					});
-				}
+
+		var urls = [
+			url,
+		];
+
+		for (var url of urls) {
+			if (await check_tab(url))
+				return;
+		}
+
+		if (tabs[host] && tabs[host].active) {
+			chrome.tabs.update(tabs[host].id, { url: url });
+		} else {
+			chrome.tabs.create({ url: url }, function(tab) {
+				tabs[host] = tab;
 			});
-		});
-	}));
+		}
+	}
+}
+
+// check
+setInterval(async function() {
+	if (localStorage.getItem('switch') !== '1' || checking) return;
+	try {
+		checking = true;
+		await check();
+	} finally {
+		checking = false;
+	}
 }, 500);

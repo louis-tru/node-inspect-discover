@@ -170,10 +170,10 @@ $(function() {
 	render({}, true);
 
 	// check
-	setInterval(function() {
-		list.filter(e=>e.ok&&e.value).map((e)=>check(e.value, function(err, desc) {
-			e.available(!!desc);
-		}));
+	setInterval(async function() {
+		for (var e of list.filter(e=>e.ok&&e.value)) {
+			e.available(!!await request_desc(e.value));
+		}
 	}, 1000);
 
 });

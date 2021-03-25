@@ -24,20 +24,19 @@ async function request(url) {
 	});
 }
 
-async function check(host, cb) {
-	if (!is_checks[host]) {
-		try {
-			is_checks[host] = true;
-			var [desc] = await request(`http:/${host}/json`);
-			if (desc) {
-				cb(null, desc);
-			} else {
-				cb(new Error('Empty'));
-			} 
-		} catch(err) {
-			cb(err);
-		} finally {
-			delete is_checks[host];
+async function request_desc(host) {
+	if (is_checks[host])
+		return null;
+	try {
+		is_checks[host] = true;
+		var [desc] = await request(`http:/${host}/json`);
+		if (desc) {
+			return desc;
 		}
+	} catch(err) {
+		console.warn(err);
+	} finally {
+		delete is_checks[host];
 	}
+	return null;
 }

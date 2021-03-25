@@ -10,6 +10,6 @@
 		"page": "discover.html"
 	},
 	"permissions": [
-		"storage", "http://*/", "https://*/", "tabs"
+		"storage", "http://*/", "https://*/", "tabs", "background"
 	]
 }
