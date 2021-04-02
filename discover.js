@@ -62,7 +62,7 @@ async function check() {
 
 		for (var url of urls) {
 			if (await check_tab(url))
-				return;
+				continue;
 		}
 
 		if (tabs[host] && tabs[host].active) {
