@@ -48,30 +48,32 @@ function check_tab(url) {
 async function check() {
 
 	for (var e of get()) {
-		var desc = await request_desc(e.value);
-		if (!desc) continue;
-		var url = desc.devtoolsFrontendUrlCompat || desc.devtoolsFrontendUrl;
-		if (!url) continue;
+		await (async function(e) {
+			var desc = await request_desc(e.value);
+			if (!desc) return;
+			var url = desc.devtoolsFrontendUrlCompat || desc.devtoolsFrontendUrl;
+			if (!url) return;
 
-		url = fix_devtools_url(url, e, desc);
-		var host = e.value;
+			url = fix_devtools_url(url, e, desc);
+			var host = e.value;
 
-		var urls = [
-			url,
-		];
+			var urls = [
+				url,
+			];
 
-		for (var url of urls) {
-			if (await check_tab(url))
-				continue;
-		}
+			for (var url of urls) {
+				if (await check_tab(url))
+					return;
+			}
 
-		if (tabs[host] && tabs[host].active) {
-			chrome.tabs.update(tabs[host].id, { url: url });
-		} else {
-			chrome.tabs.create({ url: url }, function(tab) {
-				tabs[host] = tab;
-			});
-		}
+			if (tabs[host] && tabs[host].active) {
+				chrome.tabs.update(tabs[host].id, { url: url });
+			} else {
+				chrome.tabs.create({ url: url }, function(tab) {
+					tabs[host] = tab;
+				});
+			}
+		})(e);
 	}
 }
 
