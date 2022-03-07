@@ -20,13 +20,13 @@ function fix_devtools_url(url, item, desc) {
 	var m = navigator.userAgent.match(/Chrome\/(\d+)/);
 	if (m) {
 		var version = Number(m[1]);// >= 83
-		if (version > 83) {
-			url = url.replace('chrome-devtools:', 'devtools:');
-		}
-		else if (version > 98) {
+		if (version > 98) {
 			// chrome://devtools/bundled/inspector.html?experiments=true&v8only=true&ws=127.0.0.1:9220/16ed027d-ad5f-4b8f-a3dd-5e1dec5cc8e0
 			// devtools://devtools/bundled/devtools_app.html
-			url = url.replace('^chrome://devtools/bundled/inspector.html', 'devtools://devtools/bundled/devtools_app.html');
+			url = url.replace('chrome://devtools/bundled/inspector.html', 'devtools://devtools/bundled/devtools_app.html');
+		}
+		else if (version > 83) {
+			url = url.replace('chrome-devtools:', 'devtools:');
 		}
 	}
 
