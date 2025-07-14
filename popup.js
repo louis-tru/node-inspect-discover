@@ -2,8 +2,8 @@
 var config_list_div;
 var list = [];
 
-function save() {
-	localStorage.setItem('list', JSON.stringify(list));
+function saveList() {
+	chrome.storage.local.set({list});
 }
 
 function render(data, fresh) {
@@ -73,12 +73,12 @@ function render(data, fresh) {
 				data.ok = 1;
 				if (fresh) {
 					fresh = false;
-					save();
+					saveList();
 					div.removeClass('selected');
 					div.removeClass('fresh');
 					render({}, true);
 				} else if (data.value != value) {
-					save();
+					saveList();
 					input.blur();
 				}
 			}
@@ -108,7 +108,7 @@ function render(data, fresh) {
 				list.splice(i, 1);
 			}
 		}
-		save();
+		saveList();
 		div.remove();
 		config_list_div.find('div.fresh > input').focus();
 	});
@@ -119,8 +119,9 @@ function render(data, fresh) {
 	return div;
 }
 
-function updateSwitch() {
-	if (localStorage.getItem('switch') === '1') {
+async function updateSwitch() {
+	let val = await chrome.storage.local.get('switch');
+	if (val.switch === '1') {
 		$('#button-switch').html('Off');
 		$('#button-switch').addClass('on');
 	} else {
@@ -129,7 +130,7 @@ function updateSwitch() {
 	}
 }
 
-$(function() {
+$(async function() {
 
 	config_list_div = $('#config-list');//querySelector
 
@@ -138,16 +139,17 @@ $(function() {
 		close();
 	});
 
-	$('#button-switch').click(function() {
-		if (localStorage.getItem('switch') === '1') {
-			localStorage.setItem('switch', '0');
+	$('#button-switch').click(async function() {
+		let val = await chrome.storage.local.get('switch');
+		if (val.switch === '1') {
+			await chrome.storage.local.set({'switch': '0'});
 		} else {
-			localStorage.setItem('switch', '1');
+			await chrome.storage.local.set({'switch': '1'});
 		}
-		updateSwitch();
+		await updateSwitch();
 	});
 
-	updateSwitch();
+	await updateSwitch();
 
 	/*
 		<div class="target-discovery-line config-list-row">
@@ -166,13 +168,15 @@ $(function() {
 		</div>
 	*/
 
-	get().forEach(e=>render(e));
+	for (let it of await getList()) {
+		render(it);
+	}
 	render({}, true);
 
 	// check
 	setInterval(async function() {
 		for (var e of list.filter(e=>e.ok&&e.value)) {
-			e.available(!!await request_desc(e.value));
+			e.available(!!await getDebugInfo(e.value));
 		}
 	}, 1000);
 

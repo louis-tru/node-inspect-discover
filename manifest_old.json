@@ -1,21 +1,19 @@
 {
 	"name": "Node Discover",
 	"description" : "Base Level Extension",
-	"version": "1.1",
-	"manifest_version": 3,
-	"action": {
+	"version": "1.0",
+	"manifest_version": 2,
+	"browser_action": {
 		"default_popup": "popup.html"
 	},
 	"background": {
-		"service_worker": "discover.js"
+		"page": "discover.html"
 	},
 	"permissions": [
 		"storage",
 		"tabs",
 		"background",
-		"debugger"
-	],
-	"host_permissions": [
+		"debugger",
 		"http://*/",
 		"https://*/"
 	]

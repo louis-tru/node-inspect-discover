@@ -1,4 +1,6 @@
 
+importScripts('./utils.js');
+
 // var url = 
 // 	'https://chrome-devtools-frontend.appspot.com/serve_file/'+
 // 	'@548c459fb7741b83bd517b12882f533b04a5513e/inspector.html?'+
@@ -55,9 +57,9 @@ function check_tab(url) {
 
 async function check() {
 
-	for (var e of get()) {
+	for (var e of await getList()) {
 		await (async function(e) {
-			var desc = await request_desc(e.value);
+			var desc = await getDebugInfo(e.value);
 			if (!desc) return;
 			var url = desc.devtoolsFrontendUrlCompat || desc.devtoolsFrontendUrl;
 			if (!url) return;
@@ -87,11 +89,15 @@ async function check() {
 
 // check
 setInterval(async function() {
-	if (localStorage.getItem('switch') !== '1' || checking) return;
-	try {
-		checking = true;
-		await check();
-	} finally {
-		checking = false;
+	let val = await chrome.storage.local.get('switch');
+	if (val.switch !== '1')
+		return;
+	if (!checking) {
+		try {
+			checking = true;
+			await check();
+		} finally {
+			checking = false;
+		}
 	}
 }, 500);
